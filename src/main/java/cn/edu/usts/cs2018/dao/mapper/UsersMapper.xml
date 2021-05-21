@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.edu.usts.cs2018.dao.mapper.UsersMapper" >
+    <!-- 多对多嵌套查询：通过执行另外一条SQL映射语句来返回预期的特殊类型 -->
+    <resultMap id="Activities" type="cn.edu.usts.cs2018.entity.Activity">
+        <id property="id" column="id"></id>
+        <result property="content" column="content"></result>
+        <result property="username" column="username"></result>
+        <result property="activityname" column="activityname"></result>
+        <result property="tourname" column="tourname"></result>
+    </resultMap>
+
+    <resultMap type="cn.edu.usts.cs2018.entity.User" id="UserMap">
+        <id property="id" column="id"></id>
+        <result property="username" column="username"></result>
+        <result property="realname" column="realname"></result>
+        <result property="password" column="password"></result>
+        <result property="cardid" column="cardid"></result>
+        <result property="sex" column="sex"></result>
+        <result property="job" column="job"></result>
+    </resultMap>
+    <select id="findUserById" parameterType="Integer" resultMap="UserMap">
+        select *
+        from tb_user
+        where id=#{id}
+    </select>
+    
+    <select id="findUserByName" parameterType="String" resultMap="UserMap">
+        select *
+        from tb_user
+        where username=#{username};
+    </select>
+    <insert id="insertUser" parameterType="cn.edu.usts.cs2018.entity.User" keyProperty="id">
+        <choose>
+            <when test="id!=0">
+                insert into tb_user (id,username,realname,password,cardid,sex,job)
+                values (#{id},#{username},#{realname},#{password},#{cardid},#{sex},#{job});
+            </when>
+            <when test="id==0">
+                insert into tb_user (username,realname,password,cardid,sex,job)
+                values (#{username},#{realname},#{password},#{cardid},#{sex},#{job});
+            </when>
+        </choose>
+
+    </insert>
+    <update id="updateUser" parameterType="cn.edu.usts.cs2018.entity.User">
+        update tb_user
+        <choose>
+        <when test="id !=null">
+        <set>
+
+                username=#{username},realname=#{realname},password=#{password},cardid=#{cardid},sex=#{sex},job=#{job}
+
+        </set>
+        where id=#{id};
+        </when>
+        <otherwise>
+            <set>
+
+                realname=#{realname},password=#{password},cardid=#{cardid},sex=#{sex},job=#{job}
+
+            </set>
+            where username=#{username};
+        </otherwise>
+    </choose>
+    </update>
+    
+    <delete id="deleteUserById" parameterType="int">
+        delete from tb_user where id=#{id};
+    </delete>
+    <delete id="deleteUserByName" parameterType="String">
+        delete from tb_user where username=#{username};
+    </delete>
+    <select id="findActivity" parameterType="String" resultMap="Activities">
+        select *
+        from tb_activity
+        where username=#{username};
+    </select>
+</mapper>

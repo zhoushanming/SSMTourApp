@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.edu.usts.cs2018.dao.mapper.CostMapper" >
+    <!-- 多对多嵌套查询：通过执行另外一条SQL映射语句来返回预期的特殊类型 -->
+
+    <resultMap type="cn.edu.usts.cs2018.entity.Cost" id="CostMap">
+        <id property="id" column="id"></id>
+        <result property="tourname" column="tourname"></result>
+        <result property="activityname" column="activityname"></result>
+        <result property="username" column="username"></result>
+        <result property="cost" column="cost"></result>
+        <result property="pay" column="pay"></result>
+    </resultMap>
+
+    <select id="findCostById" parameterType="Integer" resultMap="CostMap">
+        select *
+        from cost
+        where id=#{id}
+    </select>
+    <select id="findCostByUsername" parameterType="String" resultMap="CostMap">
+        select *
+        from cost
+        where username=#{username}
+    </select>
+
+
+
+    <select id="findCostByTAU" parameterType="String" resultMap="CostMap">
+        select *
+        from cost
+        where tourname=#{tourname} and activityname=#{activityname} and username=#{username};
+    </select>
+
+    <select id="findCostByTAname" resultMap="CostMap">
+        select *
+        from cost
+        where tourname=#{tourname} and activityname=#{activityname};
+    </select>
+    <insert id="insertCost" parameterType="cn.edu.usts.cs2018.entity.Cost" keyProperty="id">
+
+        <choose>
+            <when test="id ==0">
+                insert into cost (tourname,activityname,username,cost,pay)
+                values (#{tourname},#{activityname},#{username},#{cost},#{pay});
+            </when>
+            <when test="id!=0">
+                insert into cost (id,tourname,activityname,username,cost,pay)
+                values (#{id},#{tourname},#{activityname},#{username},#{cost},#{pay});
+            </when>
+        </choose>
+
+
+    </insert>
+
+
+
+    <update id="updateCost" parameterType="cn.edu.usts.cs2018.entity.Cost">
+        update cost
+        <choose>
+            <when test="id !=0">
+                <set>
+                    tourname=#{tourname},activityname=#{activityname},username=#{username},cost=#{cost},pay=#{pay}
+                </set>
+                where id=#{id};
+            </when>
+            <when test="id==0">
+                <set>
+                   username=#{username},cost=#{cost},pay=#{pay}
+                </set>
+                where  tourname=#{tourname} and activityname=#{activityname};
+            </when>
+        </choose>
+    </update>
+
+
+
+    <delete id="deleteCost" parameterType="cn.edu.usts.cs2018.entity.Cost">
+        delete from cost where id=#{id};
+    </delete>
+
+
+
+
+</mapper>

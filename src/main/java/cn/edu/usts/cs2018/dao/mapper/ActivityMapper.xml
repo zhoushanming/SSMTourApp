@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.edu.usts.cs2018.dao.mapper.ActivityMapper" >
+    <!-- 多对多嵌套查询：通过执行另外一条SQL映射语句来返回预期的特殊类型 -->
+
+    <resultMap type="cn.edu.usts.cs2018.entity.Activity" id="ActivityMap">
+        <id property="id" column="id"></id>
+        <result property="content" column="content"></result>
+        <result property="username" column="username"></result>
+        <result property="activityname" column="activityname"></result>
+        <result property="tourname" column="tourname"></result>
+    </resultMap>
+
+    <select id="findActivityById" parameterType="Integer" resultMap="ActivityMap">
+        select *
+        from tb_activity
+        where id=#{id}
+    </select>
+       <select id="findActivityByTourname" resultMap="ActivityMap">
+                select *
+                from tb_activity
+                where  tourname=#{tourname};
+        </select>
+
+    <select id="findActivityByTournameActivityname" resultMap="ActivityMap">
+            select *
+            from tb_activity
+            where  tourname=#{tourname} and activityname=#{activityname};
+    </select>
+
+
+    <select id="findActivityByUsernameTourname"  resultMap="ActivityMap">
+            select *
+            from tb_activity
+            where  username=#{username} and tourname=#{tourname};
+    </select>
+    <insert id="insertActivity" parameterType="cn.edu.usts.cs2018.entity.Activity" keyProperty="id">
+        <choose>
+                    <when test="id ==0">
+                        insert into tb_activity (content,username,activityname,tourname)
+                        values (#{content},#{username},#{activityname},#{tourname});
+
+                    </when>
+                    <when test="id!=0">
+                       insert into tb_activity (id,content,username,activityname,tourname)
+                       values (#{id},#{content},#{username},#{activityname},#{tourname});
+
+                    </when>
+        </choose>
+
+    </insert>
+    <update id="updateActivity" parameterType="cn.edu.usts.cs2018.entity.Activity">
+        update tb_tour
+        <choose>
+            <when test="id !=0">
+                <set>
+                    content=#{content},username=#{username},activityname=#{activityname},tourname=#{tourname}
+                </set>
+                where id=#{id};
+            </when>
+            <otherwise>
+                <set>
+                    content=#{content},username=#{username}
+                </set>
+                where  activityname=#{activityname};
+            </otherwise>
+        </choose>
+    </update>
+
+    <delete id="deleteActivityById" parameterType="int">
+        delete from tb_activity where id=#{id};
+    </delete>
+
+    <delete id="deleteActivityByTourname" parameterType="String">
+        delete from tb_activity where tourname=#{tourname};
+    </delete>
+    <delete id="deleteActivityByActivityname" parameterType="String">
+        delete from tb_activity where activityname=#{activityname};
+    </delete>
+
+    <delete id="deleteActivityByActivity" parameterType="Activity">
+            delete from tb_activity where activityname=#{activityname} and username=#{username} and tourname=#{tourname};
+
+
+    </delete>
+
+
+</mapper>

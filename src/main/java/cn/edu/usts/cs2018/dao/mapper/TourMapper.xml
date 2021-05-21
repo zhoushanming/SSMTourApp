@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.edu.usts.cs2018.dao.mapper.TourMapper" >
+    <!-- 多对多嵌套查询：通过执行另外一条SQL映射语句来返回预期的特殊类型 -->
+
+    <resultMap type="cn.edu.usts.cs2018.entity.Tour" id="TourMap">
+        <id property="id" column="id"></id>
+        <result property="tourname" column="tourname"></result>
+        <result property="leader" column="leader"></result>
+        <result property="username" column="username"></result>
+        <result property="introduction" column="introduction"></result>
+
+        <result property="startdate" column="startdate"></result>
+        <result property="enddate" column="enddate"></result>
+    </resultMap>
+
+    <select id="findTourById" parameterType="Integer" resultMap="TourMap">
+        select *
+        from tb_tour
+        where id=#{id}
+    </select>
+
+    <select id="findTourByUsername" parameterType="String" resultMap="TourMap">
+        select *
+        from tb_tour
+        where username=#{username};
+    </select>
+    <select id="findTourByLeader" parameterType="String" resultMap="TourMap">
+        select *
+        from tb_tour
+        where leader=#{leader};
+    </select>
+    <select id="findTourByTourname" parameterType="String" resultMap="TourMap">
+        select *
+        from tb_tour
+        where tourname=#{tourname};
+    </select>
+    <select id="findAllTour" resultType="java.lang.String">
+        select distinct tourname from tb_tour;
+    </select>
+
+    <select id="findAllLeader">
+
+    </select>
+    <insert id="insertTour" parameterType="cn.edu.usts.cs2018.entity.Tour" keyProperty="id">
+        <choose>
+            <when test="id ==0">
+                insert into tb_tour (tourname,leader,username,introduction,startdate,enddate)
+                values (#{tourname},#{leader},#{username},#{introduction},#{startdate},#{enddate});
+            </when>
+            <when test="id!=0">
+                insert into tb_tour (id,tourname,leader,username,introduction,startdate,enddate)
+                values (#{id},#{tourname},#{leader},#{username},#{introduction},#{startdate},#{enddate});
+            </when>
+        </choose>
+
+    </insert>
+
+
+    <update id="updateTour" parameterType="cn.edu.usts.cs2018.entity.Tour">
+        update tb_tour
+        <choose>
+            <when test="id !=null">
+                <set>
+                    tourname=#{tourname},leader=#{leader},username=#{username},introduction=#{introduction},startdate=#{startdate},enddate=#{enddate}
+
+                </set>
+                where id=#{id};
+            </when>
+            <otherwise>
+                <set>
+
+                    id=#{id},leader=#{leader},username=#{username},introduction=#{introduction},startdate=#{startdate},enddate=#{enddate}
+
+
+                </set>
+                where  tourname=#{tourname};
+            </otherwise>
+        </choose>
+    </update>
+
+    <delete id="deleteTourById" parameterType="int">
+        delete from tb_tour where id=#{id};
+    </delete>
+    <delete id="deleteTourByTourname" parameterType="String">
+        delete from tb_tour where tourname=#{tourname};
+    </delete>
+    <delete id="deleteTourByLeader" parameterType="String">
+        delete from tb_tour where leader=#{leader};
+    </delete>
+    <delete id="deleteTourByUsernameTourname" parameterType="String">
+        delete from tb_tour where username=#{username} and tourname=#{tourname};
+    </delete>
+
+
+</mapper>
